@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Project;
 
 class ProjectController extends Controller
 {
@@ -13,7 +14,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $projects = Project::all();
+
+        return view('projects.index', compact('projects'));
     }
 
     /**
@@ -23,7 +26,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return view('projects.create');
     }
 
     /**
@@ -34,7 +37,20 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:projects',
+            'customer' => 'required',
+            'description' => 'required',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
+        ]);
+
+        $project = Project::create($request->all());
+
+        $project->user()->associate(Auth::user());
+        $project->save();
+
+        return redirect('projects.index')->with('status', 'success');
     }
 
     /**
@@ -45,7 +61,9 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        //
+        $project = Project::find($id);
+
+        return view('projects.show', compact('project'));
     }
 
     /**
@@ -56,7 +74,9 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        //
+        $project = Project::find($id);
+
+        return view('projects.edit', compact('project'));
     }
 
     /**
@@ -68,7 +88,19 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'sometimes|required|unique:projects',
+            'customer' => 'sometimes|required',
+            'description' => 'sometimes|required',
+            'start_date' => 'sometimes|required|date',
+            'end_date' => 'sometimes|required|date'
+        ]);
+
+        $project = Project::find($id);
+
+        $project->update($request->all());
+
+        return redirect('projects.index')->with('status', 'success');
     }
 
     /**
@@ -79,6 +111,10 @@ class ProjectController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $project = Project::find($id);
+
+        $project->delete();
+
+        return redirect('projects.index')->with('status', 'success');
     }
 }
