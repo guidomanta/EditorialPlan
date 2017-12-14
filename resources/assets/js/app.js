@@ -14,3 +14,6 @@ require('./bootstrap');
  */
 
 require('./components/Example');
+require('./components/IndexProjects');
+require('./components/IndexActivities');
+require('./projects.js')
