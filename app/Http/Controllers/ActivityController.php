@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Activity;
 use App\Project;
+use Validator;
 
 class ActivityController extends Controller
 {
@@ -15,7 +16,7 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        $activities = Activity::all()
+        $activities = Activity::all();
 
         return view('activities.index', compact('activities'));
     }
@@ -44,17 +45,32 @@ class ActivityController extends Controller
             redirect('activities.index')->with('status', 'error');
         }
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'release_date' => 'required|date',
-            'type' => 'required|in',
+            'type' => 'required|in:'.implode(',', Activity::getTypes()),
             'category' => 'required',
             'text' => 'required',
-            'media' => 'required|mimes:jpg,png,avi',
-            'text_validation' => 'required',
-            'media_validation' => 'required'
+            'media' => 'required|file|mimes:jpeg,png,avi',
+            'text_validation' => 'required|in:'.implode(',', Activity::getValidationTypes()),
+            'media_validation' => 'required|in:'.implode(',', Activity::getValidationTypes())
         ]);
 
-        $activity = Activity::create($request->all());
+        if ($validator->fails()) {
+            return redirect('activities.create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        $activity =  new Activity([
+            'release_date' => $request->release_date,
+            'type' => $request->type,
+            'category' => $request->category,
+            'text' => $request->text,
+            'media' => $file_name,
+            'text_validation' => $request->text_validation,
+            'media_validation' => $request->media_validation
+        ]);
+
         $activity->project()->associate($project);
         $activity->save();
 
@@ -96,15 +112,21 @@ class ActivityController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'release_date' => 'sometimes|required|date',
-            'type' => 'sometimes|required|in',
+            'type' => 'sometimes|required|in:'.implode(',', Activity::getTypes()),
             'category' => 'sometimes|required',
             'text' => 'sometimes|required',
-            'media' => 'sometimes|required|mimes:jpg,png,avi',
-            'text_validation' => 'sometimes|required',
-            'media_validation' => 'sometimes|required'
+            'media' => 'sometimes|required|file|mimes:jpeg,png,avi',
+            'text_validation' => 'sometimes|required|in:'.implode(',', Activity::getValidationTypes()),
+            'media_validation' => 'sometimes|required|in:'.implode(',', Activity::getValidationTypes())
         ]);
+
+        if ($validator->fails()) {
+            return redirect('activities.index')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
 
         $activity = Activity::find($id);
         $activity->update($request->all());

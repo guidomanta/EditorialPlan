@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Project;
+use Validator;
 
 class ProjectController extends Controller
 {
@@ -37,7 +39,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|unique:projects',
             'customer' => 'required',
             'description' => 'required',
@@ -45,7 +47,19 @@ class ProjectController extends Controller
             'end_date' => 'required|date'
         ]);
 
-        $project = Project::create($request->all());
+        if ($validator->fails()) {
+            return redirect('projects.create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        $project = new Project([
+            'name' => $request->name,
+            'customer' => $request->customer,
+            'description' => $request->description,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date
+        ]);
 
         $project->user()->associate(Auth::user());
         $project->save();
@@ -88,16 +102,21 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'sometimes|required|unique:projects',
-            'customer' => 'sometimes|required',
-            'description' => 'sometimes|required',
-            'start_date' => 'sometimes|required|date',
-            'end_date' => 'sometimes|required|date'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:projects',
+            'customer' => 'required',
+            'description' => 'required',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
         ]);
 
-        $project = Project::find($id);
+        if ($validator->fails()) {
+            return redirect('projects.index')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
 
+        $project = Project::find($id);
         $project->update($request->all());
 
         return redirect('projects.index')->with('status', 'success');
@@ -112,7 +131,6 @@ class ProjectController extends Controller
     public function destroy($id)
     {
         $project = Project::find($id);
-
         $project->delete();
 
         return redirect('projects.index')->with('status', 'success');
