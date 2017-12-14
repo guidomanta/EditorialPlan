@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Activity;
 use App\Project;
+use Storage;
 use Validator;
 
 class ActivityController extends Controller
@@ -40,6 +41,7 @@ class ActivityController extends Controller
     public function store(Request $request)
     {
         $project_id = $request->input('project_id');
+        $file_name = $request->media->getClientOriginalName();
 
         if (empty($project_id) || empty($project = Project::find($project_id))) {
             redirect('activities.index')->with('status', 'error');
@@ -73,6 +75,8 @@ class ActivityController extends Controller
 
         $activity->project()->associate($project);
         $activity->save();
+
+        Storage::disk('public')->put('media/'.$file_name, file_get_contents($request->media));
 
         return redirect('projects.index')->with('status', 'success');
     }
@@ -145,6 +149,22 @@ class ActivityController extends Controller
         $activity = Activity::find($id);
         $activity->delete();
 
+        Storage::disk('public')->delete($activity->media);
+
         return redirect('activities.index')->with('status', 'success');
+    }
+
+    /**
+     * Download the specified resource media from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadMedia($id)
+    {
+        $activity = Activity::find($id);
+        $file_path = storage_path('app/public/media/'.$activity->media);
+
+        return response()->download($file_path);
     }
 }
