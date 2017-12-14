@@ -22,4 +22,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('projects', 'ProjectController');
     Route::resource('activities', 'ActivityController');
+    Route::get('activities/{id}/media/download', 'ActivityController@downloadMedia');
 });
