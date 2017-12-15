@@ -58,12 +58,9 @@
                                 </button>
                             </td>
                             <td>
-                                <form id="data-form" class="form-inline" method="POST" enctype="multipart/form-data">
-                                    {!! csrf_field() !!}
-                                    <button id="delete-btn" class="btn btn-danger" type="button" data-id="{{ $project->id }}">
-                                        Delete
-                                    </button>
-                                </form>
+                                <button id="delete-btn" class="btn btn-danger" type="button" data-id="{{ $project->id }}">
+                                    Delete
+                                </button>
                             </td>
                           </tr>
                       @endforeach

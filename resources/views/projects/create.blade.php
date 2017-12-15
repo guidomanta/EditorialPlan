@@ -50,23 +50,22 @@
                                 <input class="form-control" id="description" name="description">
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Start Date</label>
-                                <input class="form-control text-right" id="start_date" type="text"
+                                <input class="form-control" id="start_date" type="text"
                                     data-date-format="dd/mm/yyyy" name="start_date">
                             </div>
-                        </div>
-                        <div class="col-md-12">
+                        </div><div class="col-md-6">
                             <div class="form-group">
                                 <label>End Date</label>
-                                <input class="form-control text-right" id="end_date" type="text"
+                                <input class="form-control" id="end_date" type="text"
                                     data-date-format="dd/mm/yyyy" name="end_date">
                             </div>
                         </div>
                     </div>
                 </form>
-                <button type="button" class="btn btn-success" id="create-project-btn">
+                <button type="button" class="btn btn-success pull-right" id="create-project-btn">
                     Create
                 </button>
             </div>
