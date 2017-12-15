@@ -64,7 +64,7 @@ class ProjectController extends Controller
         $project->user()->associate(Auth::user());
         $project->save();
 
-        return redirect('projects')->with('status', 'success');
+        return response()->json(['status' => 'success']);
     }
 
     /**
@@ -119,7 +119,7 @@ class ProjectController extends Controller
         $project = Project::find($id);
         $project->update($request->all());
 
-        return redirect('projects')->with('status', 'success');
+        return response()->json(['status' => 'success']);
     }
 
     /**
@@ -133,6 +133,6 @@ class ProjectController extends Controller
         $project = Project::find($id);
         $project->delete();
 
-        return redirect('projects')->with('status', 'success');
+        return response()->json(['status' => 'success']);
     }
 }
